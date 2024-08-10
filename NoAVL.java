@@ -5,6 +5,6 @@ public class NoAVL {
 
     public NoAVL(OrdemServico os) {
         this.os = os;
-        altura = 1;
+        altura = 0;
     }
 }
