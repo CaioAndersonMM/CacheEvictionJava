@@ -183,11 +183,30 @@ public class Arvore {
         return atual;
     }
 
+
+    public NoAVL buscar(int codigo) {
+        return buscar(raiz, codigo);
+    }
+
+    private NoAVL buscar(NoAVL node, int codigo) {
+        if (node == null) {
+            return null;
+        }
+
+        if (codigo == node.os.getCodigo()) {
+            return node;
+        } else if (codigo < node.os.getCodigo()) {
+            return buscar(node.esq, codigo);
+        } else {
+            return buscar(node.dir, codigo);
+        }
+    }
+
     public void verArvore(){
         verArvore(this.raiz, 0);
     }
 
-    public void verArvore(NoAVL no, int nivel){
+    private void verArvore(NoAVL no, int nivel){
         System.out.print(no.os.getCodigo() + " - "); System.out.print(no.os.getNome()); System.out.print(" - Nível " + nivel);
         System.out.println();
 
@@ -196,6 +215,36 @@ public class Arvore {
         }
         if (no.dir != null) {
             verArvore(no.dir, nivel+1);
+        }
+    }
+
+    public void listarOS() {
+       listarOS(this.raiz);
+    }
+
+    private void listarOS(NoAVL no) {
+        if (no != null) {
+            listarOS(no.esq);
+            System.out.println("-----------------------------");
+            System.out.println("Código: " + no.os.getCodigo());
+            System.out.println("Nome: " + no.os.getNome());
+            System.out.println("Descrição: " + no.os.getDescricao());
+            System.out.println("Hora da Solicitação: " + no.os.getHoraSolicitacao());
+            System.out.println("-----------------------------");
+            listarOS(no.dir);
+        }
+    }
+
+    public void alterar(OrdemServico novaOS) {
+        
+        NoAVL node = buscar(novaOS.getCodigo());
+        
+        if (node != null) {
+            node.os.setNome(novaOS.getNome());
+            node.os.setDescricao(novaOS.getDescricao());
+            node.os.setHoraSolicitacao(novaOS.getHoraSolicitacao());
+        } else {
+            System.out.println("Ordem de Serviço não encontrada.");
         }
     }
 }
