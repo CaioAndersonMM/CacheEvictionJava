@@ -27,12 +27,33 @@ public class OrdemServico {
         return horaSolicitacao;
     }
 
+    public void setCodigo(int codigo) {
+        this.codigo = codigo;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public void setHoraSolicitacao(long horaSolicitacao) {
+        this.horaSolicitacao = horaSolicitacao;
+    }
+
     public String toString() {
-        return "OrdemServico{" +
-                "codigo=" + codigo +
-                ", nome='" + nome + '\'' +
-                ", descricao='" + descricao + '\'' +
-                ", horaSolicitacao=" + horaSolicitacao +
-                '}';
+        return String.format(
+            "+=============================+%n" +
+            "||       Ordem de Serviço      %n" +
+            "===============================%n" +
+            "|| Código:      %4d           %n" +
+            "|| Nome:        %-15s %n" +
+            "|| Descrição:   %-15s %n" +
+            "|| Hora:        %04d          %n" +
+            "+=============================+%n",
+            codigo, nome, descricao, horaSolicitacao
+        );
     }
 }
