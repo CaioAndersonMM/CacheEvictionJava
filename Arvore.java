@@ -182,4 +182,20 @@ public class Arvore {
 
         return atual;
     }
+
+    public void verArvore(){
+        verArvore(this.raiz, 0);
+    }
+
+    public void verArvore(NoAVL no, int nivel){
+        System.out.print(no.os.getCodigo() + " - "); System.out.print(no.os.getNome()); System.out.print(" - Nível " + nivel);
+        System.out.println();
+
+        if (no.esq != null) {
+            verArvore(no.esq, nivel+1);
+        }
+        if (no.dir != null) {
+            verArvore(no.dir, nivel+1);
+        }
+    }
 }
