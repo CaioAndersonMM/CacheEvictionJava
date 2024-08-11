@@ -56,4 +56,8 @@ public class OrdemServico {
             codigo, nome, descricao, horaSolicitacao
         );
     }
+
+    public String imprimir() {
+        return String.format("{cod = %d | %s} - ", codigo, nome);
+    }
 }
