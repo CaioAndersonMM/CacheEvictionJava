@@ -1,11 +1,16 @@
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Arvore {
     private NoAVL raiz;
 
-    public NoAVL getRaiz(){
+    public NoAVL getRaiz() {
         return this.raiz;
     }
 
-    public void setRaiz(NoAVL raiz){
+    public void setRaiz(NoAVL raiz) {
         this.raiz = raiz;
     }
 
@@ -16,14 +21,14 @@ public class Arvore {
         return no.altura;
     }
 
-    private int maior(int a, int b){
+    private int maior(int a, int b) {
         return (a > b) ? a : b;
     }
 
-    public NoAVL inserir(NoAVL node, OrdemServico os) {    
+    public NoAVL inserir(NoAVL node, OrdemServico os) {
         if (node == null)
             return new NoAVL(os);
-            
+
         if (os.getCodigo() < node.os.getCodigo())
             node.esq = inserir(node.esq, os);
         else if (os.getCodigo() > node.os.getCodigo())
@@ -31,7 +36,7 @@ public class Arvore {
         else
             return node;
 
-        //Atualizar alturas do ancestral
+        // Atualizar alturas do ancestral
 
         node.altura = 1 + maior(altura(node.esq), altura(node.dir));
 
@@ -41,23 +46,27 @@ public class Arvore {
         int fbSubArvEsq = obterFB(node.esq);
         int fbSubArvDir = obterFB(node.dir);
 
-        //4 possibilidades:
+        // 4 possibilidades:
 
-        if (fb > 1 && fbSubArvEsq >= 0){
+        if (fb > 1 && fbSubArvEsq >= 0) {
+            escreverLog("Rotacao Simples a Direita: " + now());
             return rotacaoDireitaSimples(node);
         }
 
-        if (fb < -1 && fbSubArvDir <= 0 ) {
+        if (fb < -1 && fbSubArvDir <= 0) {
+            escreverLog("Rotacao Simples a Esquerda: " + now());
             return rotacaoEsquerdaSimples(node);
         }
 
         // Rotação dupla direita
         if (fb > 1 && fbSubArvEsq < 0) {
+            escreverLog("Rotacao Dupla Direita: " + now());
             node.esq = rotacaoEsquerdaSimples(node.esq);
             return rotacaoDireitaSimples(node);
         }
-            // Rotação dupla esquerda
+        // Rotação dupla esquerda
         if (fb < -1 && fbSubArvDir > 0) {
+            escreverLog("Rotacao Dupla Esquerda: " + now());
             node.dir = rotacaoDireitaSimples(node.dir);
             return rotacaoEsquerdaSimples(node);
         }
@@ -66,21 +75,23 @@ public class Arvore {
 
     }
 
-    public int obterFB(NoAVL node){
+    public int obterFB(NoAVL node) {
         if (node == null)
             return 0;
 
         return altura(node.esq) - altura(node.dir);
     }
 
-    private NoAVL rotacaoEsquerdaSimples(NoAVL x){
+    private NoAVL rotacaoEsquerdaSimples(NoAVL x) {
         NoAVL y = x.dir; // guarda subarvore direita de x em y (arvore guardada)
         NoAVL z = y.esq; // subarvore esquerda da arvore guardada, y, é guardada.
 
         // Rotação
         y.esq = x; // árvore original na subárvore esquerda da árvore guardada
-        x.dir = z; /* subárvore direita da árvore original recebe subárvore
-        esquerda da árvore guardada */
+        x.dir = z; /*
+                    * subárvore direita da árvore original recebe subárvore
+                    * esquerda da árvore guardada
+                    */
 
         // Atualiza alturas dos nós
         x.altura = maior(altura(x.esq), altura(x.dir)) + 1;
@@ -90,7 +101,7 @@ public class Arvore {
         return y;
     }
 
-    private NoAVL rotacaoDireitaSimples(NoAVL y){
+    private NoAVL rotacaoDireitaSimples(NoAVL y) {
         NoAVL x = y.esq; // guarda a subarvore esquerda da árvore original
         NoAVL z = x.dir; // subarvore direita da subarvore guardada
         // Executa rotação
@@ -106,7 +117,12 @@ public class Arvore {
         return x;
     }
 
-    NoAVL remover(NoAVL node, OrdemServico os){
+    public void remover(OrdemServico os) {
+        raiz = remover(raiz, os);
+    }
+
+    NoAVL remover(NoAVL node, OrdemServico os) {
+
         if (node == null)
             return node;
 
@@ -114,28 +130,30 @@ public class Arvore {
             node.esq = remover(node.esq, os);
         else if (os.getCodigo() > node.os.getCodigo())
             node.dir = remover(node.dir, os);
-        else{
-            //Nó sem filhos
+        else {
+            // Nó sem filhos
             if (node.esq == null && node.dir == null)
                 node = null;
 
-            //Nó só com filho a direita
-            else if (node.esq == null){
+            // Nó só com filho a direita
+            else if (node.esq == null) {
                 NoAVL temp = node;
                 node = temp.dir;
                 temp = null;
             }
 
-            //Só filho a esquerda
-            else if (node.dir == null){
+            // Só filho a esquerda
+            else if (node.dir == null) {
                 NoAVL temp = node;
                 node = temp.esq;
                 temp = null;
             }
 
-            else{
-                /*Nó com 2 filhos: pegue o sucessor do percurso em ordem
-                * Menor chave da subárvore direita do nó */
+            else {
+                /*
+                 * Nó com 2 filhos: pegue o sucessor do percurso em ordem
+                 * Menor chave da subárvore direita do nó
+                 */
                 NoAVL temp = noMenorChave(node.dir);
                 node.os = temp.os;
                 node.dir = remover(node.dir, temp.os);
@@ -152,22 +170,26 @@ public class Arvore {
         int fbSubArvEsq = obterFB(node.esq);
         int fbSubArvDir = obterFB(node.dir);
 
-        //4 possibilidades:
-        if (fb > 1 && fbSubArvEsq >= 0){
+        // 4 possibilidades:
+        if (fb > 1 && fbSubArvEsq >= 0) {
+            escreverLog("Rotacao Simples a Direita: " + now());
             return rotacaoDireitaSimples(node);
         }
 
-        if (fb < -1 && fbSubArvDir <= 0 ) {
+        if (fb < -1 && fbSubArvDir <= 0) {
+            escreverLog("Rotacao Simples a Esquerda: " + now());
             return rotacaoEsquerdaSimples(node);
         }
 
         // Rotação dupla direita
         if (fb > 1 && fbSubArvEsq < 0) {
+            escreverLog("Rotacao Dupla Direita: " + now());
             node.esq = rotacaoEsquerdaSimples(node.esq);
             return rotacaoDireitaSimples(node);
         }
-            // Rotação dupla esquerda
+        // Rotação dupla esquerda
         if (fb < -1 && fbSubArvDir > 0) {
+            escreverLog("Rotacao Dupla Esquerda: " + now());
             node.dir = rotacaoDireitaSimples(node.dir);
             return rotacaoEsquerdaSimples(node);
         }
@@ -182,7 +204,6 @@ public class Arvore {
 
         return atual;
     }
-
 
     public NoAVL buscar(int codigo) {
         return buscar(raiz, codigo);
@@ -202,24 +223,26 @@ public class Arvore {
         }
     }
 
-    public void verArvore(){
+    public void verArvore() {
         verArvore(this.raiz, 0);
     }
 
-    private void verArvore(NoAVL no, int nivel){
-        System.out.print(no.os.getCodigo() + " - "); System.out.print(no.os.getNome()); System.out.print(" - Nível " + nivel);
+    private void verArvore(NoAVL no, int nivel) {
+        System.out.print(no.os.getCodigo() + " - ");
+        System.out.print(no.os.getNome());
+        System.out.print(" - Nível " + nivel);
         System.out.println();
 
         if (no.esq != null) {
-            verArvore(no.esq, nivel+1);
+            verArvore(no.esq, nivel + 1);
         }
         if (no.dir != null) {
-            verArvore(no.dir, nivel+1);
+            verArvore(no.dir, nivel + 1);
         }
     }
 
     public void listarOS() {
-       listarOS(this.raiz);
+        listarOS(this.raiz);
     }
 
     private void listarOS(NoAVL no) {
@@ -236,9 +259,9 @@ public class Arvore {
     }
 
     public void alterar(OrdemServico novaOS) {
-        
+
         NoAVL node = buscar(novaOS.getCodigo());
-        
+
         if (node != null) {
             node.os.setNome(novaOS.getNome());
             node.os.setDescricao(novaOS.getDescricao());
@@ -246,5 +269,18 @@ public class Arvore {
         } else {
             System.out.println("Ordem de Serviço não encontrada.");
         }
+    }
+
+    private void escreverLog(String msg) {
+        try (FileWriter writer = new FileWriter("log.txt", true)) {
+            writer.write(msg + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String now() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return LocalDateTime.now().format(formatter);
     }
 }
