@@ -1,6 +1,5 @@
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.time.LocalDateTime;
@@ -120,6 +119,10 @@ public class Servidor {
         System.out.println();
         this.arvore.listarOS();
         System.out.println();
+    }
+
+    public int quantidadeDeRegistros(){
+        return this.arvore.contarRegistros();
     }
 
     private String now() {

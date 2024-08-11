@@ -258,6 +258,19 @@ public class Arvore {
         }
     }
 
+    public int contarRegistros(){
+        return contarNos(this.raiz);
+    }
+
+    public int contarNos(NoAVL no){
+        if (no == null) {
+            return 0;
+        }
+        
+        return 1 + contarNos(no.esq) + contarNos(no.dir);
+
+    }
+
     public void alterar(OrdemServico novaOS) {
 
         NoAVL node = buscar(novaOS.getCodigo());
