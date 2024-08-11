@@ -1,3 +1,5 @@
+import java.util.InputMismatchException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Main {
@@ -7,23 +9,35 @@ public class Main {
 
         gerarOrdensFicticias(server);
 
-        server.mostrarArvore();
+        boolean option = true;
 
-        while (true) {
-            System.out.println("1 - Cadastrar");
-            System.out.println("2 - Listar");
-            System.out.println("3 - Alterar");
-            System.out.println("4 - Remover");
-            System.out.println("5 - Acessar Quantidade de Registros");
-            System.out.println("6 - Ver Cache");
+        while (option) {
+            try {
+                System.out.println("| 1 | - Cadastrar");
+                System.out.println("| 2 | - Listar");
+                System.out.println("| 3 |- Alterar");
+                System.out.println("| 4 |- Remover");
+                System.out.println("| 5 | - Acessar Quantidade de Registros");
+                System.out.println("| 6 | - Ver Cache");
+                System.out.println("| 7 | - Ver Arvore (Níveis)");
+                System.out.println("| 0 | - Sair");
+
+
 
             int escolha = sc.nextInt();
 
             switch (escolha) {
                 case 1:
                     System.out.println("Digite o código da Ordem de Serviço:");
-                    int codigo = sc.nextInt();
+                    int codInserir = sc.nextInt();
                     sc.nextLine();
+
+                    OrdemServico osInserir = server.buscarOrdemServico(codInserir);
+
+                    if (osInserir != null) { //OS já existe
+                        System.out.println("Já existe essa Ordem de Serviço");
+                        break;
+                    }
 
                     System.out.println("Digite o nome da Ordem de Serviço:");
                     String nome = sc.nextLine();
@@ -35,12 +49,12 @@ public class Main {
                     int hora = sc.nextInt();
                     sc.nextLine(); 
 
-                    OrdemServico novaOS = new OrdemServico(codigo, nome, descricao, hora);
+                    OrdemServico novaOS = new OrdemServico(codInserir, nome, descricao, hora);
                     server.cadastrarOrdemServico(novaOS);
+                    System.out.println("Ordem de Serviço cadastrada: ");
+                    System.out.println(novaOS);
                     break;
                 case 2:
-                    // System.out.println("Árvore AVL de Ordens de Serviço:");
-                    // server.mostrarArvore();
                     server.mostrarOrdensServico();
                     break;
                 case 3:
@@ -48,24 +62,24 @@ public class Main {
                     int codEdit = sc.nextInt();
                     sc.nextLine(); 
 
-                    OrdemServico os = server.buscarOrdemServico(codEdit);
-                    if (os != null) {
-                        System.out.println(os);
+                    OrdemServico osEdit = server.buscarOrdemServico(codEdit);
+                    if (osEdit != null) {
+                        System.out.println(osEdit);
 
                         System.out.println("Edite o novo nome da Ordem de Serviço:");
-                        os.setNome(sc.nextLine());
+                        osEdit.setNome(sc.nextLine());
 
                         System.out.println("Edite a nova descrição da Ordem de Serviço:");
-                        os.setDescricao(sc.nextLine());
+                        osEdit.setDescricao(sc.nextLine());
 
                         System.out.println("Edite a nova hora da solicitação (formato HHMM):");
-                        os.setHoraSolicitacao(sc.nextInt());
+                        osEdit.setHoraSolicitacao(sc.nextInt());
                         sc.nextLine();
 
-                        server.atualizarOrdemServico(os);
+                        server.atualizarOrdemServico(osEdit);
                         System.out.println("Ordem de Serviço alterada com sucesso!");
                     } else {
-                        System.out.println("Ordem de Serviço não encontrada.");
+                        System.out.println("Ordem de Serviço não encontrada!");
                     }
                     break;
 
@@ -76,32 +90,43 @@ public class Main {
 
                     OrdemServico osRemove = server.buscarOrdemServico(codRemove);
                     if (osRemove != null) {
-                        server.removerOrdemServico(codRemove);
+                        server.removerOrdemServico(osRemove);
                     } else {
                         System.out.println("Ordem de Serviço não encontrada.");
                     }
                     break;
-
-                default:
+                case 6:
+                    server.mostrarCache();
                     break;
 
+                case 7:
+                    server.mostrarArvore();
+                    break;
+                case 0: 
+                    option = false;
+                default:
+                    break;
+            }
+
+            } catch (InputMismatchException e) {
+                System.out.println("Entrada inválida! Por favor, insira um número.");
+                sc.nextLine();
+            } catch (NoSuchElementException e) {
+                System.out.println("Erro ao ler entrada");
+                break;
             }
         }
+
+        sc.close();
+
     }
 
     public static Servidor gerarOrdensFicticias(Servidor server) {
 
-        OrdemServico os = new OrdemServico(1, "Ajeitar projetor", "LoremLoremLorem", 2);
-        OrdemServico os2 = new OrdemServico(2, "Consertar arcondicionado", "LoremLoremLorem", 14);
-        OrdemServico os3 = new OrdemServico(3, "Porta quebrada", "LoremLoremLorem", 9);
-        OrdemServico os4 = new OrdemServico(4, "Ajeitar projetor", "LoremLoremLorem", 2);
-        OrdemServico os5 = new OrdemServico(5, "Goteira no teto", "LoremLoremLorem", 22);
-
-        server.cadastrarOrdemServico(os);
-        server.cadastrarOrdemServico(os2);
-        server.cadastrarOrdemServico(os3);
-        server.cadastrarOrdemServico(os4);
-        server.cadastrarOrdemServico(os5);
+        for (int i = 1; i <= 4; i++) {
+            OrdemServico os = new OrdemServico(i, "Serviço " + i, "Descrição do serviço " + i, (i * 2) % 24);
+            server.cadastrarOrdemServico(os);
+        }
 
         return server;
 
