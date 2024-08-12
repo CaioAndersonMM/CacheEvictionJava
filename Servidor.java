@@ -37,8 +37,8 @@ public class Servidor {
         escreverLog("");
         escreverLog("Remoção de Ordem de Serviço: " + removeOS.getCodigo());
 
-        arvore.remover(removeOS);
         cache.remover(removeOS.getCodigo());
+        arvore.remover(removeOS);
 
         
         escreverLog("Altura da Árvore: " + arvore.getRaiz().altura + ", Time: " + now());
