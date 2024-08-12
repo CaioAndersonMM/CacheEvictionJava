@@ -18,8 +18,9 @@ public class Main {
                 System.out.println("| 3 |- Alterar");
                 System.out.println("| 4 |- Remover");
                 System.out.println("| 5 | - Acessar Quantidade de Registros");
-                System.out.println("| 6 | - Ver Cache");
-                System.out.println("| 7 | - Ver Arvore (Níveis)");
+                System.out.println("| 6 | - Buscar Ordem de Serviço");
+                System.out.println("| 7 | - Ver Cache");
+                System.out.println("| 8 | - Ver Arvore (Níveis)");
                 System.out.println("| 0 | - Sair");
 
                 int escolha = sc.nextInt();
@@ -98,11 +99,24 @@ public class Main {
                         int qtdRegistros = server.quantidadeDeRegistros();
                         System.out.println(qtdRegistros);
                         break;
+
                     case 6:
-                        server.mostrarCache();
+                        System.out.println("Qual Ordem de Serviço você quer buscar? ");
+                        int codBuscar = sc.nextInt();
+                        OrdemServico osBuscada = server.buscarOrdemServico(codBuscar);
+                        if (osBuscada != null) {
+                            System.out.println(osBuscada);
+                        } else {
+                            System.out.println("Ordem de Serviço não encontrada.");
+                        }
+
                         break;
 
                     case 7:
+                        server.mostrarCache();
+                        break;
+
+                    case 8:
                         server.mostrarArvore();
                         break;
                     case 0:
