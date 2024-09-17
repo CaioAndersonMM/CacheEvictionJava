@@ -20,7 +20,7 @@ public class Main {
                 System.out.println("| 5 | - Acessar Quantidade de Registros");
                 System.out.println("| 6 | - Buscar Ordem de Serviço");
                 System.out.println("| 7 | - Ver Cache");
-                System.out.println("| 8 | - Ver Arvore (Níveis)");
+                System.out.println("| 8 | - Ver Tabela Hash");
                 System.out.println("| 0 | - Sair");
 
                 int escolha = sc.nextInt();

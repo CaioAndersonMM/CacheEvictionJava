@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Servidor {
-    private Arvore arvore;
+    private TabelaHash tabelaHash;
     private CacheFIFO cache;
 
     public Servidor() {
-        arvore = new Arvore();
+        tabelaHash = new TabelaHash();
         cache = new CacheFIFO();
     }
 
@@ -22,12 +22,12 @@ public class Servidor {
     public void cadastrarOrdemServico(OrdemServico os) {
         escreverLog("");
         escreverLog("Insercao de Ordem de Servico: " + os.getCodigo());
-        arvore.setRaiz(arvore.inserir(arvore.getRaiz(), os));
 
-        NoAVL noBuscado = arvore.buscar(os.getCodigo());
-        cache.adicionar(noBuscado); // colocando o no na cache
+        tabelaHash.inserir(os.getCodigo(), os);
 
-        escreverLog("Altura da arvore: " + arvore.getRaiz().altura + ", Time: " + now());
+        OrdemServico osBuscada = tabelaHash.buscar(os.getCodigo());
+
+        cache.adicionar(osBuscada); // colocando os na cache (referência)
         escreverLog("Itens da cache: " + cache.gerarStringCache());
 
     }
@@ -38,22 +38,20 @@ public class Servidor {
         escreverLog("Remoção de Ordem de Serviço: " + removeOS.getCodigo());
 
         cache.remover(removeOS.getCodigo());
-        arvore.remover(removeOS);
+        tabelaHash.remover(removeOS);
 
-        
-        escreverLog("Altura da Árvore: " + arvore.getRaiz().altura + ", Time: " + now());
         escreverLog("Itens da cache: " + cache.gerarStringCache());
 
     }
 
     public void atualizarOrdemServico(OrdemServico novaOS) {
 
-        NoAVL noBuscado = buscarNaCache(novaOS.getCodigo());
+        OrdemServico osBuscada = buscarNaCache(novaOS.getCodigo());
 
-        if (noBuscado != null) { // Encontrado na cache
-            noBuscado.os.setNome(novaOS.getNome());
-            noBuscado.os.setDescricao(novaOS.getDescricao());
-            noBuscado.os.setHoraSolicitacao(novaOS.getHoraSolicitacao());
+        if (osBuscada != null) { // Encontrado na cache
+            osBuscada.setNome(novaOS.getNome());
+            osBuscada.setDescricao(novaOS.getDescricao());
+            osBuscada.setHoraSolicitacao(novaOS.getHoraSolicitacao());
             System.out.println("Alterada na cache -> Árvore");
 
             escreverLog("");
@@ -64,12 +62,12 @@ public class Servidor {
         }
 
         // Não tem na cache edita na árvore
-        arvore.alterar(novaOS);
+        tabelaHash.alterar(novaOS);
 
         // Reload no item da cache
-        noBuscado = arvore.buscar(novaOS.getCodigo());
+        osBuscada = tabelaHash.buscar(novaOS.getCodigo());
         cache.remover(novaOS.getCodigo());
-        cache.adicionar(noBuscado); // Armazena referencia
+        cache.adicionar(osBuscada); // Armazena referencia
 
         escreverLog("");
         escreverLog("Alteracao na Ordem de Servico: " + novaOS.getCodigo() + ", Time: " + now());
@@ -77,23 +75,22 @@ public class Servidor {
 
     }
 
-    public NoAVL buscarNaCache(int codigo) {
-        NoAVL no = cache.buscar(codigo);
-        return no;
-
+    public OrdemServico buscarNaCache(int codigo) {
+        OrdemServico os = cache.buscar(codigo);
+        return os;
     }
 
     public OrdemServico buscarOrdemServico(int codigo) {
 
         // Primeiro busca na cache
-        NoAVL buscado = buscarNaCache(codigo);
+        OrdemServico buscado = buscarNaCache(codigo);
         if (buscado != null) {
             System.out.println("Ordem de Serviço encontrada na cache! ");
-            return buscado.os;
+            return buscado;
         }
 
         // Não achou - busca na árvore
-        buscado = arvore.buscar(codigo);
+        buscado = tabelaHash.buscar(codigo);
 
         if (buscado != null) { // Encontrou na árvore
             cache.adicionar(buscado); // Adiciona na cache
@@ -103,26 +100,26 @@ public class Servidor {
             escreverLog("Item buscado foi adicionado na Cache: " + codigo + ", Time: " + now());
             escreverLog("Itens da cache: " + cache.gerarStringCache());
 
-            return buscado.os;
+            return buscado;
         }
 
         return null;
     }
 
-    public void mostrarArvore() {
+    public void mostrarTabelaHash() {
         System.out.println();
-        this.arvore.verArvore();
+        this.tabelaHash.verTabela();
         System.out.println();
     }
 
     public void mostrarOrdensServico() {
         System.out.println();
-        this.arvore.listarOS();
+        this.tabelaHash.listarOS();
         System.out.println();
     }
 
-    public int quantidadeDeRegistros(){
-        return this.arvore.contarRegistros();
+    public int quantidadeDeRegistros() {
+        return this.tabelaHash.contarRegistros();
     }
 
     private String now() {
