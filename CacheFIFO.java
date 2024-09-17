@@ -2,43 +2,43 @@ import java.util.LinkedList;
 
 public class CacheFIFO {
     private final int maxSize;
-    private LinkedList<NoAVL> cache;
+    private LinkedList<OrdemServico> cache;
 
     public CacheFIFO() {
         this.maxSize = 21;
         this.cache = new LinkedList<>();
     }
 
-    public void adicionar(NoAVL os) {
+    public void adicionar(OrdemServico os) {
         if (cache.size() >= maxSize) {
             cache.removeFirst();
         }
         cache.addLast(os);
     }
 
-    public NoAVL buscar(int codigo) {
-        for (NoAVL no : cache) {
-            if (no.os.getCodigo() == codigo) { 
-                return no;
+    public OrdemServico buscar(int codigo) {
+        for (OrdemServico os : cache) {
+            if (os.getCodigo() == codigo) { 
+                return os;
             }
         }
         return null;
     }
 
     public void listarCache() {
-        for (NoAVL no : cache) {
-            System.out.println(no.os);
+        for (OrdemServico os : cache) {
+            System.out.println(os);
         }
     }
 
     public void remover(int codigo) {
-        cache.removeIf(no -> no.os.getCodigo() == codigo);
+        cache.removeIf(os -> os.getCodigo() == codigo);
     }
 
     public String gerarStringCache() {
         StringBuilder sb = new StringBuilder();
-        for (NoAVL no : cache) {
-            sb.append(no.os.imprimir()).append(", ");
+        for (OrdemServico os : cache) {
+            sb.append(os.imprimir()).append(", ");
         }
         return sb.length() > 0 ? sb.substring(0, sb.length() - 2) : "Cache vazia";
     }
