@@ -8,8 +8,8 @@ public class TabelaHash {
 
     public TabelaHash() {
         // Inicializa com a primeira potência de 2 próxima e encontrar o menor primo
-        m = encontrarMenorPrimo(proximaPotenciaDe2(30));
-        tabela = new LinkedList[30];
+        m = encontrarMaiorPrimoAbaixo(proximaPotenciaDe2(30));
+        tabela = new LinkedList[m];
         tamanho = 0;
 
         // Cada indice do array é uma linkedlist pois pode haver colisões
@@ -67,12 +67,28 @@ public class TabelaHash {
         return null;
     }
 
+    public void alterarOrdemServico(OrdemServico novaOrdem) {
+        int indice = hash(novaOrdem.getCodigo());
+        LinkedList<Entrada> lista = tabela[indice];
+    
+        for (Entrada entrada : lista) {
+            if (entrada.codigo == novaOrdem.getCodigo()) {
+                entrada.ordem = novaOrdem;
+                System.out.println("Ordem de serviço " + novaOrdem.getCodigo() + " foi alterada.");
+                return;
+            }
+        }
+    
+        System.out.println("Ordem de serviço com código " + novaOrdem.getCodigo() + " não encontrada.");
+    }
+
     private int hash(int codigo) {
         return Integer.hashCode(codigo) % tabela.length;
     }
 
     private void redimensionar() {
-        LinkedList<Entrada>[] novaTabela = new LinkedList[tabela.length * 2];
+        int novoTamanho = encontrarMaiorPrimoAbaixo(proximaPotenciaDe2(tabela.length * 2));
+        LinkedList<Entrada>[] novaTabela = new LinkedList[novoTamanho];
         for (int i = 0; i < novaTabela.length; i++) {
             novaTabela[i] = new LinkedList<>();
         }
@@ -88,8 +104,7 @@ public class TabelaHash {
     }
 
     private void redimensionarParaMenor() {
-        int novoTamanho = encontrarMenorPrimo(proximaPotenciaDe2(tabela.length / 2));
-    
+        int novoTamanho = encontrarMaiorPrimoAbaixo(proximaPotenciaDe2(tabela.length / 2));    
         LinkedList<Entrada>[] novaTabela = new LinkedList[novoTamanho];
         for (int i = 0; i < novaTabela.length; i++) {
             novaTabela[i] = new LinkedList<>();
@@ -105,6 +120,34 @@ public class TabelaHash {
         tabela = novaTabela;
     }
 
+
+    public void imprimirTabela() {
+        for (int i = 0; i < tabela.length; i++) {
+            System.out.print(i + " -> ");
+            LinkedList<Entrada> lista = tabela[i];
+            if (lista.isEmpty()) {
+                System.out.println();
+            } else {
+                for (Entrada entrada : lista) {
+                    System.out.print(entrada.codigo + " | ");
+                }
+                System.out.println();
+            }
+        }
+    }
+
+    public int getTamanho() {
+        return this.tamanho;
+    }
+
+    public int getMod(){
+        return this.m;
+    }
+
+    public float getFatorDeCarga(){
+        return (float) tamanho / tabela.length;
+    }
+
     private int proximaPotenciaDe2(int n) {
         int potencia = 1;
         while (potencia < n) {
@@ -113,9 +156,10 @@ public class TabelaHash {
         return potencia;
     }
 
-    private int encontrarMenorPrimo(int n) {
+    private int encontrarMaiorPrimoAbaixo(int n) {
+        n--;  // Começa com o número imediatamente abaixo da potência de 2
         while (!ehPrimo(n)) {
-            n++;
+            n--;
         }
         return n;
     }
