@@ -101,6 +101,7 @@ public class TabelaHash {
         }
 
         tabela = novaTabela;
+        m = novoTamanho;
     }
 
     private void redimensionarParaMenor() {
@@ -118,6 +119,7 @@ public class TabelaHash {
         }
     
         tabela = novaTabela;
+        m = novoTamanho;
     }
 
 
