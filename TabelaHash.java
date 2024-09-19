@@ -1,13 +1,15 @@
 import java.util.LinkedList;
 
 public class TabelaHash {
-    private static final int m = 30;
+    private int m;
     private LinkedList<Entrada>[] tabela = new LinkedList[m]; // Array de linkedlists
     private int tamanho;
     private static final double alfaCarga = 0.75;
 
     public TabelaHash() {
-        tabela = new LinkedList[m];
+        // Inicializa com a primeira potência de 2 próxima e encontrar o menor primo
+        m = encontrarMenorPrimo(proximaPotenciaDe2(30));
+        tabela = new LinkedList[30];
         tamanho = 0;
 
         // Cada indice do array é uma linkedlist pois pode haver colisões
@@ -17,7 +19,7 @@ public class TabelaHash {
     }
 
     public void inserir(int codigo, OrdemServico ordem) {
-        if ((double) tamanho / tabela.length >= alfaCarga) {
+        if ((double) tamanho / tabela.length >= alfaCarga) { //Acima de 75% da capacidade
             redimensionar();
         }
 
@@ -33,6 +35,19 @@ public class TabelaHash {
 
         lista.add(new Entrada(codigo, ordem));
         tamanho++;
+    }
+
+    public void remover(int codigo) {
+        int indice = hash(codigo);
+        LinkedList<Entrada> lista = tabela[indice];
+    
+        for (Entrada entrada : lista) {
+            if (entrada.codigo == codigo) {
+                lista.remove(entrada);
+                tamanho--;
+                return;
+            }
+        }
     }
 
     public OrdemServico buscar(int codigo) {
@@ -65,6 +80,31 @@ public class TabelaHash {
         }
 
         tabela = novaTabela;
+    }
+
+    private int proximaPotenciaDe2(int n) {
+        int potencia = 1;
+        while (potencia < n) {
+            potencia *= 2;
+        }
+        return potencia;
+    }
+
+    private int encontrarMenorPrimo(int n) {
+        while (!ehPrimo(n)) {
+            n++;
+        }
+        return n;
+    }
+
+    private boolean ehPrimo(int n) {
+        if (n <= 1) return false;
+        if (n == 2 || n == 3) return true;
+        if (n % 2 == 0 || n % 3 == 0) return false;
+        for (int i = 5; i * i <= n; i += 6) {
+            if (n % i == 0 || n % (i + 2) == 0) return false;
+        }
+        return true;
     }
 
     private static class Entrada {
