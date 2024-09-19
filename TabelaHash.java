@@ -19,7 +19,7 @@ public class TabelaHash {
     }
 
     public void inserir(int codigo, OrdemServico ordem) {
-        if ((double) tamanho / tabela.length >= alfaCarga) { //Acima de 75% da capacidade
+        if ((double) tamanho / tabela.length >= alfaCarga) { // Acima de 75% da capacidade
             redimensionar();
         }
 
@@ -40,11 +40,16 @@ public class TabelaHash {
     public void remover(int codigo) {
         int indice = hash(codigo);
         LinkedList<Entrada> lista = tabela[indice];
-    
+
         for (Entrada entrada : lista) {
             if (entrada.codigo == codigo) {
                 lista.remove(entrada);
                 tamanho--;
+
+                if ((double) tamanho / tabela.length < 0.25) {
+                    redimensionarParaMenor();
+                }
+
                 return;
             }
         }
@@ -82,6 +87,24 @@ public class TabelaHash {
         tabela = novaTabela;
     }
 
+    private void redimensionarParaMenor() {
+        int novoTamanho = encontrarMenorPrimo(proximaPotenciaDe2(tabela.length / 2));
+    
+        LinkedList<Entrada>[] novaTabela = new LinkedList[novoTamanho];
+        for (int i = 0; i < novaTabela.length; i++) {
+            novaTabela[i] = new LinkedList<>();
+        }
+    
+        for (LinkedList<Entrada> lista : tabela) {
+            for (Entrada entrada : lista) {
+                int indice = Integer.hashCode(entrada.codigo) % novaTabela.length;
+                novaTabela[indice].add(entrada);
+            }
+        }
+    
+        tabela = novaTabela;
+    }
+
     private int proximaPotenciaDe2(int n) {
         int potencia = 1;
         while (potencia < n) {
@@ -98,11 +121,15 @@ public class TabelaHash {
     }
 
     private boolean ehPrimo(int n) {
-        if (n <= 1) return false;
-        if (n == 2 || n == 3) return true;
-        if (n % 2 == 0 || n % 3 == 0) return false;
+        if (n <= 1)
+            return false;
+        if (n == 2 || n == 3)
+            return true;
+        if (n % 2 == 0 || n % 3 == 0)
+            return false;
         for (int i = 5; i * i <= n; i += 6) {
-            if (n % i == 0 || n % (i + 2) == 0) return false;
+            if (n % i == 0 || n % (i + 2) == 0)
+                return false;
         }
         return true;
     }
