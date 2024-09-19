@@ -38,7 +38,7 @@ public class Servidor {
         escreverLog("Remoção de Ordem de Serviço: " + removeOS.getCodigo());
 
         cache.remover(removeOS.getCodigo());
-        tabelaHash.remover(removeOS);
+        tabelaHash.remover(removeOS.getCodigo());
 
         escreverLog("Itens da cache: " + cache.gerarStringCache());
 
@@ -62,7 +62,7 @@ public class Servidor {
         }
 
         // Não tem na cache edita na árvore
-        tabelaHash.alterar(novaOS);
+        tabelaHash.alterarOrdemServico(novaOS);
 
         // Reload no item da cache
         osBuscada = tabelaHash.buscar(novaOS.getCodigo());
@@ -108,20 +108,28 @@ public class Servidor {
 
     public void mostrarTabelaHash() {
         System.out.println();
-        this.tabelaHash.verTabela();
+        this.tabelaHash.imprimirTabela();
         System.out.println();
     }
 
-    public void mostrarOrdensServico() {
-        System.out.println();
-        this.tabelaHash.listarOS();
-        System.out.println();
-    }
+    // public void mostrarOrdensServico() {
+    //     System.out.println();
+    //     this.tabelaHash.listarOS();
+    //     System.out.println();
+    // }
 
     public int quantidadeDeRegistros() {
-        return this.tabelaHash.contarRegistros();
+        return this.tabelaHash.getTamanho();
     }
 
+    public int mostrarMod(){
+        return this.tabelaHash.getMod();
+    }
+
+    public float mostrarFatorDeCarga(){
+        return this.tabelaHash.getFatorDeCarga();
+    }
+    
     private String now() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return LocalDateTime.now().format(formatter);
