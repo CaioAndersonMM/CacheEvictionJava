@@ -20,7 +20,7 @@ public class Main {
                 System.out.println("| 5 | - Acessar Quantidade de Registros");
                 System.out.println("| 6 | - Buscar Ordem de Serviço");
                 System.out.println("| 7 | - Ver Cache");
-                System.out.println("| 8 | - Ver Tabela Hash");
+                System.out.println("| 8 | - Ver Mod e Fator de Carga");
                 System.out.println("| 0 | - Sair");
 
                 int escolha = sc.nextInt();
@@ -54,7 +54,7 @@ public class Main {
                         System.out.println(novaOS);
                         break;
                     case 2:
-                        server.mostrarOrdensServico();
+                        server.mostrarTabelaHash();
                         break;
                     case 3:
                         System.out.println("Digite o código da Ordem de Serviço para alterar:");
@@ -96,8 +96,7 @@ public class Main {
                         break;
 
                     case 5:
-                        int qtdRegistros = server.quantidadeDeRegistros();
-                        System.out.println(qtdRegistros);
+                        System.out.println("Quantidade de Registros: " + server.quantidadeDeRegistros());
                         break;
 
                     case 6:
@@ -117,8 +116,9 @@ public class Main {
                         break;
 
                     case 8:
-                        server.mostrarArvore();
+                        System.out.println("Mod: " + server.mostrarMod() + " Carga: " + String.format("%.2f", server.mostrarFatorDeCarga())+"%");
                         break;
+
                     case 0:
                         option = false;
                     default:
@@ -140,7 +140,7 @@ public class Main {
 
     public static Servidor gerarOrdensFicticias(Servidor server) {
 
-        for (int i = 1; i <= 60; i++) {
+        for (int i = 0; i <= 60; i++) {
             OrdemServico os = new OrdemServico(i, "Serviço " + i, "Descrição do serviço " + i, (i * 2) % 24);
             server.cadastrarOrdemServico(os);
         }
