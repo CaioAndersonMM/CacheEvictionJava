@@ -2,17 +2,17 @@ import java.util.LinkedList;
 
 public class TabelaHash {
     private int m;
-    private LinkedList<Entrada>[] tabela = new LinkedList[m]; // Array de linkedlists
+    private LinkedList<Entrada>[] tabela; // Array de linkedlists
     private int tamanho;
     private static final double alfaCarga = 0.75;
 
     public TabelaHash() {
-        // Inicializa com a primeira potência de 2 próxima e encontrar o menor primo
+        // Inicializa com a primeira potência de 2 próxima e encontrar o menor primo apartir do 30
         m = encontrarMaiorPrimoAbaixo(proximaPotenciaDe2(30));
         tabela = new LinkedList[m];
         tamanho = 0;
 
-        // Cada indice do array é uma linkedlist pois pode haver colisões
+        // Cada indice do array é uma linkedlist pois pode haver colisões (Encadeamento Aberto)
         for (int i = 0; i < tabela.length; i++) {
             tabela[i] = new LinkedList<>();
         }
