@@ -7,11 +7,11 @@ import java.time.format.DateTimeFormatter;
 
 public class Servidor {
     private TabelaHash tabelaHash;
-    private CacheFIFO cache;
+    private CacheHash cache;
 
     public Servidor() {
         tabelaHash = new TabelaHash();
-        cache = new CacheFIFO();
+        cache = new CacheHash();
     }
 
     public void mostrarCache() {
