@@ -9,7 +9,7 @@ public class CacheHash {
 
     public CacheHash() {
         this.maxSize = 20;
-        this.tabela = new LinkedList[20]; //No pior cenário
+        this.tabela = new LinkedList[31]; //Ajuste no tamanho/mod para evitar muitas colisões
         this.random = new Random();
         this.tamanho = 0;
 
