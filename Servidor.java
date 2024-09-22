@@ -29,7 +29,7 @@ public class Servidor {
 
         cache.adicionar(osBuscada); // colocando os na cache (referência)
         escreverLog("Itens da cache: " + cache.gerarStringCache());
-
+        escreverLog("Estado da Tabela Hash: " + tabelaHash.gerarString());
     }
 
     public void removerOrdemServico(OrdemServico removeOS) {
@@ -41,6 +41,7 @@ public class Servidor {
         tabelaHash.remover(removeOS.getCodigo());
 
         escreverLog("Itens da cache: " + cache.gerarStringCache());
+        escreverLog("Estado da Tabela Hash: " + tabelaHash.gerarString());
 
     }
 
@@ -57,7 +58,7 @@ public class Servidor {
             escreverLog("");
             escreverLog("Alteracao na Ordem de Servido feita na cache: " + novaOS.getCodigo() + ", Time: " + now());
             escreverLog("Itens da cache: " + cache.gerarStringCache());
-
+            escreverLog("Estado da Tabela Hash: " + tabelaHash.gerarString());
             return;
         }
 
@@ -72,6 +73,7 @@ public class Servidor {
         escreverLog("");
         escreverLog("Alteracao na Ordem de Servico: " + novaOS.getCodigo() + ", Time: " + now());
         escreverLog("Itens da cache: " + cache.gerarStringCache());
+        escreverLog("Estado da Tabela Hash: " + tabelaHash.gerarString());
 
     }
 
@@ -80,7 +82,7 @@ public class Servidor {
         return os;
     }
 
-    public OrdemServico buscarOrdemServico(int codigo) {
+    public OrdemServico buscarOrdemServico(int codigo, boolean isRemove) {
 
         // Primeiro busca na cache
         OrdemServico buscado = buscarNaCache(codigo);
@@ -93,11 +95,15 @@ public class Servidor {
         buscado = tabelaHash.buscar(codigo);
 
         if (buscado != null) { // Encontrou na árvore
-            cache.adicionar(buscado); // Adiciona na cache
+
             System.out.println("Ordem de Serviço encontrada na base de dados (Árvore)! ");
 
+            if (!isRemove) {
+                cache.adicionar(buscado); // Adiciona na cache APENAS se não for buscar de remoção
+                escreverLog("Item buscado foi adicionado na Cache: " + codigo + ", Time: " + now());
+            }
+
             escreverLog("");
-            escreverLog("Item buscado foi adicionado na Cache: " + codigo + ", Time: " + now());
             escreverLog("Itens da cache: " + cache.gerarStringCache());
 
             return buscado;
