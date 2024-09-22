@@ -31,7 +31,7 @@ public class Main {
                         int codInserir = sc.nextInt();
                         sc.nextLine();
 
-                        OrdemServico osInserir = server.buscarOrdemServico(codInserir);
+                        OrdemServico osInserir = server.buscarOrdemServico(codInserir, false);
 
                         if (osInserir != null) { // OS já existe
                             System.out.println("Já existe essa Ordem de Serviço");
@@ -61,7 +61,7 @@ public class Main {
                         int codEdit = sc.nextInt();
                         sc.nextLine();
 
-                        OrdemServico osEdit = server.buscarOrdemServico(codEdit);
+                        OrdemServico osEdit = server.buscarOrdemServico(codEdit, false);
                         if (osEdit != null) {
                             System.out.println(osEdit);
 
@@ -87,7 +87,7 @@ public class Main {
                         int codRemove = sc.nextInt();
                         sc.nextLine();
 
-                        OrdemServico osRemove = server.buscarOrdemServico(codRemove);
+                        OrdemServico osRemove = server.buscarOrdemServico(codRemove, true);
                         if (osRemove != null) {
                             server.removerOrdemServico(osRemove);
                         } else {
@@ -102,7 +102,7 @@ public class Main {
                     case 6:
                         System.out.println("Qual Ordem de Serviço você quer buscar? ");
                         int codBuscar = sc.nextInt();
-                        OrdemServico osBuscada = server.buscarOrdemServico(codBuscar);
+                        OrdemServico osBuscada = server.buscarOrdemServico(codBuscar, false);
                         if (osBuscada != null) {
                             System.out.println(osBuscada);
                         } else {
@@ -116,7 +116,8 @@ public class Main {
                         break;
 
                     case 8:
-                        System.out.println("Mod: " + server.mostrarMod() + " Carga: " + String.format("%.2f", server.mostrarFatorDeCarga())+"%");
+                        System.out.println("Mod: " + server.mostrarMod() + " Carga: "
+                                + String.format("%.2f", server.mostrarFatorDeCarga()) + "%");
                         break;
 
                     case 0:
@@ -140,12 +141,10 @@ public class Main {
 
     public static Servidor gerarOrdensFicticias(Servidor server) {
 
-        for (int i = 0; i <= 60; i++) {
+        for (int i = 0; i <= 69; i++) {
             OrdemServico os = new OrdemServico(i, "Serviço " + i, "Descrição do serviço " + i, (i * 2) % 24);
             server.cadastrarOrdemServico(os);
         }
-
         return server;
-
     }
 }
