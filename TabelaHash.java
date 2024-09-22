@@ -1,3 +1,5 @@
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.LinkedList;
 
 public class TabelaHash {
@@ -7,12 +9,14 @@ public class TabelaHash {
     private static final double alfaCarga = 0.75;
 
     public TabelaHash() {
-        // Inicializa com a primeira potência de 2 próxima e encontrar o menor primo apartir do 30
+        // Inicializa com a primeira potência de 2 próxima e encontrar o menor primo
+        // apartir do 30
         m = encontrarMaiorPrimoAbaixo(proximaPotenciaDe2(30));
         tabela = new LinkedList[m];
         tamanho = 0;
 
-        // Cada indice do array é uma linkedlist pois pode haver colisões (Encadeamento Aberto)
+        // Cada indice do array é uma linkedlist pois pode haver colisões (Encadeamento
+        // Aberto)
         for (int i = 0; i < tabela.length; i++) {
             tabela[i] = new LinkedList<>();
         }
@@ -70,7 +74,7 @@ public class TabelaHash {
     public void alterarOrdemServico(OrdemServico novaOrdem) {
         int indice = hash(novaOrdem.getCodigo());
         LinkedList<Entrada> lista = tabela[indice];
-    
+
         for (Entrada entrada : lista) {
             if (entrada.codigo == novaOrdem.getCodigo()) {
                 entrada.ordem = novaOrdem;
@@ -78,7 +82,7 @@ public class TabelaHash {
                 return;
             }
         }
-    
+
         System.out.println("Ordem de serviço com código " + novaOrdem.getCodigo() + " não encontrada.");
     }
 
@@ -102,26 +106,29 @@ public class TabelaHash {
 
         tabela = novaTabela;
         m = novoTamanho;
+
+        escreverLog("Tabela redimensionada, para ficar maior");
     }
 
     private void redimensionarParaMenor() {
-        int novoTamanho = encontrarMaiorPrimoAbaixo(proximaPotenciaDe2(tabela.length / 2));    
+        int novoTamanho = encontrarMaiorPrimoAbaixo(proximaPotenciaDe2(tabela.length / 2));
         LinkedList<Entrada>[] novaTabela = new LinkedList[novoTamanho];
         for (int i = 0; i < novaTabela.length; i++) {
             novaTabela[i] = new LinkedList<>();
         }
-    
+
         for (LinkedList<Entrada> lista : tabela) {
             for (Entrada entrada : lista) {
                 int indice = Integer.hashCode(entrada.codigo) % novaTabela.length;
                 novaTabela[indice].add(entrada);
             }
         }
-    
+
         tabela = novaTabela;
         m = novoTamanho;
-    }
 
+        escreverLog("Tabela redimensionada, para ficar menor");
+    }
 
     public void imprimirTabela() {
         for (int i = 0; i < tabela.length; i++) {
@@ -131,7 +138,7 @@ public class TabelaHash {
                 System.out.println();
             } else {
                 for (Entrada entrada : lista) {
-                    System.out.print(entrada.codigo + " | ");
+                    System.out.print(entrada.codigo + ", " + entrada.ordem.getNome() + " | ");
                 }
                 System.out.println();
             }
@@ -142,11 +149,11 @@ public class TabelaHash {
         return this.tamanho;
     }
 
-    public int getMod(){
+    public int getMod() {
         return this.m;
     }
 
-    public float getFatorDeCarga(){
+    public float getFatorDeCarga() {
         return (float) tamanho / tabela.length;
     }
 
@@ -159,7 +166,7 @@ public class TabelaHash {
     }
 
     private int encontrarMaiorPrimoAbaixo(int n) {
-        n--;  // Começa com o número imediatamente abaixo da potência de 2
+        n--; // Começa com o número imediatamente abaixo da potência de 2
         while (!ehPrimo(n)) {
             n--;
         }
@@ -178,6 +185,24 @@ public class TabelaHash {
                 return false;
         }
         return true;
+    }
+
+    public String gerarString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("\n");
+        sb.append("Tamanho atual: ").append(getTamanho()).append("\n");
+        sb.append("Mod: ").append(getMod()).append("\n");
+        sb.append("Fator de Carga: ").append(getFatorDeCarga()).append("\n");
+        return sb.toString();
+    }
+
+    private void escreverLog(String msg) {
+        try (FileWriter writer = new FileWriter("log.txt", true)) {
+            writer.write(msg + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static class Entrada {
