@@ -1,3 +1,5 @@
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -40,6 +42,8 @@ public class CacheHash {
         // OS aleatória do índice aleatório
         LinkedList<OrdemServico> lista = tabela[indiceAleatorio];
         int osRandom = random.nextInt(lista.size());
+
+        escreverLog("Item removido, no indice: " + indiceAleatorio + " posicao: "+ osRandom);
         lista.remove(osRandom);
         tamanho--;
     }
@@ -69,7 +73,7 @@ public class CacheHash {
         for (int i = 0; i < tabela.length; i++) {
             System.out.print("Índice " + i + ": ");
             if (tabela[i].isEmpty()) {
-                System.out.println("vazio");
+                System.out.println("");
             } else {
                 for (OrdemServico os : tabela[i]) {
                     System.out.print(os.imprimir() + ", ");
@@ -107,5 +111,13 @@ public class CacheHash {
         }
 
         return cacheVazia ? "Cache vazia" : sb.toString();
+    }
+
+     private void escreverLog(String msg) {
+        try (FileWriter writer = new FileWriter("log.txt", true)) {
+            writer.write(msg + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
