@@ -20,11 +20,7 @@ public class Mensagem {
         this.horaComprimida = huffman.comprimir(hora);
         this.operacaoComprimida = huffman.comprimir(operacao);
 
-        System.out.println("Nome original: " + nome);
         System.out.println("Nome comprimido: " + nomeComprimido);
-        System.out.println("Descrição comprimida: " + descricaoComprimida);
-        System.out.println("Hora comprimida: " + horaComprimida);
-        System.out.println("Operação comprimida: " + operacaoComprimida);
     }
 
     public String descomprimirNome() {
