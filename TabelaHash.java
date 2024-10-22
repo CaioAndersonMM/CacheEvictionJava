@@ -4,7 +4,7 @@ import java.util.LinkedList;
 
 public class TabelaHash {
     private int m;
-    private LinkedList<Entrada>[] tabela; // Array de linkedlists
+    private ListaAutoajustavel[] tabela; // Array de listas autoajustáveis
     private int tamanho;
     private static final double alfaCarga = 0.75;
 
@@ -12,78 +12,61 @@ public class TabelaHash {
         // Inicializa com a primeira potência de 2 próxima e encontrar o menor primo
         // apartir do 30
         m = encontrarMaiorPrimoAbaixo(proximaPotenciaDe2(30));
-        tabela = new LinkedList[m];
+        tabela = new ListaAutoajustavel[m];
         tamanho = 0;
 
-        // Cada indice do array é uma linkedlist pois pode haver colisões (Encadeamento
+        // Cada indice do array é uma lista autoajustavel p/ colisões (Encadeamento
         // Aberto)
         for (int i = 0; i < tabela.length; i++) {
-            tabela[i] = new LinkedList<>();
+            tabela[i] = new ListaAutoajustavel();
         }
     }
 
     public void inserir(int codigo, OrdemServico ordem) {
+        
         if ((double) tamanho / tabela.length >= alfaCarga) { // Acima de 75% da capacidade
             redimensionar();
         }
 
         int indice = hash(codigo);
-        LinkedList<Entrada> lista = tabela[indice];
+        ListaAutoajustavel lista = tabela[indice];
 
-        for (Entrada entrada : lista) {
-            if (entrada.codigo == codigo) {
-                entrada.ordem = ordem;
-                return;
-            }
-        }
-
-        lista.add(new Entrada(codigo, ordem));
+        lista.adicionar(ordem);
         tamanho++;
     }
 
     public void remover(int codigo) {
         int indice = hash(codigo);
-        LinkedList<Entrada> lista = tabela[indice];
+        ListaAutoajustavel lista = tabela[indice];
 
-        for (Entrada entrada : lista) {
-            if (entrada.codigo == codigo) {
-                lista.remove(entrada);
-                tamanho--;
+        OrdemServico removido = lista.buscar(codigo);
+        if (removido != null) {
+            lista.remover(codigo);
+            tamanho--;
 
-                if ((double) tamanho / tabela.length < 0.25) {
-                    redimensionarParaMenor();
-                }
-
-                return;
+            if ((double) tamanho / tabela.length < 0.25) {
+                redimensionarParaMenor();
             }
         }
     }
 
     public OrdemServico buscar(int codigo) {
         int indice = hash(codigo);
-        LinkedList<Entrada> lista = tabela[indice];
+        ListaAutoajustavel lista = tabela[indice];
 
-        for (Entrada entrada : lista) {
-            if (entrada.codigo == codigo) {
-                return entrada.ordem;
-            }
-        }
-        return null;
+        return lista.buscar(codigo);
     }
 
     public void alterarOrdemServico(OrdemServico novaOrdem) {
         int indice = hash(novaOrdem.getCodigo());
-        LinkedList<Entrada> lista = tabela[indice];
+        ListaAutoajustavel lista = tabela[indice];
 
-        for (Entrada entrada : lista) {
-            if (entrada.codigo == novaOrdem.getCodigo()) {
-                entrada.ordem = novaOrdem;
-                System.out.println("Ordem de serviço " + novaOrdem.getCodigo() + " foi alterada.");
-                return;
-            }
+        if (lista.buscar(novaOrdem.getCodigo()) != null) {
+            lista.adicionar(novaOrdem); // Altera a ordem de serviço
+            System.out.println("Ordem de serviço " + novaOrdem.getCodigo() + " foi alterada.");
+        } else {
+            System.out.println("Ordem de serviço com código " + novaOrdem.getCodigo() + " não encontrada.");
         }
-
-        System.out.println("Ordem de serviço com código " + novaOrdem.getCodigo() + " não encontrada.");
     }
 
     private int hash(int codigo) {
@@ -92,53 +75,66 @@ public class TabelaHash {
 
     private void redimensionar() {
         int novoTamanho = encontrarMaiorPrimoAbaixo(proximaPotenciaDe2(tabela.length * 2));
-        LinkedList<Entrada>[] novaTabela = new LinkedList[novoTamanho];
+        ListaAutoajustavel[] novaTabela = new ListaAutoajustavel[novoTamanho];
         for (int i = 0; i < novaTabela.length; i++) {
-            novaTabela[i] = new LinkedList<>();
+            novaTabela[i] = new ListaAutoajustavel();
         }
 
-        for (LinkedList<Entrada> lista : tabela) {
-            for (Entrada entrada : lista) {
-                int indice = Integer.hashCode(entrada.codigo) % novaTabela.length;
-                novaTabela[indice].add(entrada);
+        // Transferindo as ordens de serviço para a nova tabela
+        for (ListaAutoajustavel lista : tabela) {
+            for (int j = 0; j < lista.contarElementos(); j++) {
+                OrdemServico ordem = lista.buscarPorIndice(j); // Usa o novo método
+                if (ordem != null) {
+                    novaTabela[hash(ordem.getCodigo())].adicionar(ordem);
+                }
             }
         }
 
         tabela = novaTabela;
         m = novoTamanho;
 
-        escreverLog("Tabela redimensionada, para ficar maior");
+        escreverLog("Tabela redimensionada para um tamanho maior");
     }
 
     private void redimensionarParaMenor() {
         int novoTamanho = encontrarMaiorPrimoAbaixo(proximaPotenciaDe2(tabela.length / 2));
-        LinkedList<Entrada>[] novaTabela = new LinkedList[novoTamanho];
+        ListaAutoajustavel[] novaTabela = new ListaAutoajustavel[novoTamanho];
         for (int i = 0; i < novaTabela.length; i++) {
-            novaTabela[i] = new LinkedList<>();
+            novaTabela[i] = new ListaAutoajustavel();
         }
 
-        for (LinkedList<Entrada> lista : tabela) {
-            for (Entrada entrada : lista) {
-                int indice = Integer.hashCode(entrada.codigo) % novaTabela.length;
-                novaTabela[indice].add(entrada);
+        // Transferindo as ordens de serviço para a nova tabela
+        for (ListaAutoajustavel lista : tabela) {
+            for (int j = 0; j < lista.contarElementos(); j++) {
+                OrdemServico ordem = lista.buscarPorIndice(j); // Usa o novo método
+                if (ordem != null) {
+                    novaTabela[hash(ordem.getCodigo())].adicionar(ordem);
+                }
             }
         }
 
         tabela = novaTabela;
         m = novoTamanho;
 
-        escreverLog("Tabela redimensionada, para ficar menor");
+        escreverLog("Tabela redimensionada para um tamanho menor");
     }
 
     public void imprimirTabela() {
         for (int i = 0; i < tabela.length; i++) {
             System.out.print(i + " -> ");
-            LinkedList<Entrada> lista = tabela[i];
-            if (lista.isEmpty()) {
-                System.out.println();
+            ListaAutoajustavel lista = tabela[i];
+    
+            // Verifica se a lista tem elementos antes de tentar imprimir
+            if (lista.contarElementos() == 0) {
+                System.out.println(" ");
             } else {
-                for (Entrada entrada : lista) {
-                    System.out.print(entrada.codigo + ", " + entrada.ordem.getNome() + " | ");
+                for (int j = 0; j < lista.contarElementos(); j++) {
+                    OrdemServico ordem = lista.buscarPorIndice(j);
+                    if (ordem != null) {
+                        System.out.print(ordem.getCodigo() + ", " + ordem.getNome() + " | ");
+                    } else {
+                        System.out.print("Ordem nula | ");
+                    }
                 }
                 System.out.println();
             }
