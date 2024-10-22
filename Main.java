@@ -45,13 +45,13 @@ public class Main {
                         String descricao = sc.nextLine();
 
                         System.out.println("Digite a hora da solicitação (formato HHMM):");
-                        int hora = sc.nextInt();
+                        String hora = sc.nextLine();
                         sc.nextLine();
 
-                        OrdemServico novaOS = new OrdemServico(codInserir, nome, descricao, hora);
-                        server.cadastrarOrdemServico(novaOS);
-                        System.out.println("Ordem de Serviço cadastrada: ");
-                        System.out.println(novaOS);
+                        //Compressão acontece no construtor
+                        Mensagem mensagem = new Mensagem(codInserir, "Cadastrar", nome, descricao, hora);
+                        server.processarMensagem(mensagem);
+                        System.out.println("Mensagem enviada ao servidor.");
                         break;
                     case 2:
                         server.mostrarTabelaHash();
@@ -66,17 +66,21 @@ public class Main {
                             System.out.println(osEdit);
 
                             System.out.println("Edite o novo nome da Ordem de Serviço:");
-                            osEdit.setNome(sc.nextLine());
+                            String nomeEdit = sc.nextLine();
 
                             System.out.println("Edite a nova descrição da Ordem de Serviço:");
-                            osEdit.setDescricao(sc.nextLine());
+                            String descricaoEdit = sc.nextLine();
 
                             System.out.println("Edite a nova hora da solicitação (formato HHMM):");
-                            osEdit.setHoraSolicitacao(sc.nextInt());
-                            sc.nextLine();
+                            String horaEdit = sc.nextLine();                            sc.nextLine();
 
-                            server.atualizarOrdemServico(osEdit);
-                            System.out.println("Ordem de Serviço alterada com sucesso!");
+                            String horaSolicitacao = String.valueOf(osEdit.getHoraSolicitacao());
+
+
+                            Mensagem mensagemAlterar = new Mensagem(codEdit, "Alterar", nomeEdit, descricaoEdit, horaEdit);
+
+                            server.processarMensagem(mensagemAlterar);
+                            System.out.println("Mensagem enviada ao servidor.");
                         } else {
                             System.out.println("Ordem de Serviço não encontrada!");
                         }
@@ -89,7 +93,10 @@ public class Main {
 
                         OrdemServico osRemove = server.buscarOrdemServico(codRemove, true);
                         if (osRemove != null) {
-                            server.removerOrdemServico(osRemove);
+                            Mensagem mensagemExcluir = new Mensagem(codRemove, "Remover", osRemove.getNome(), osRemove.getDescricao(), String.valueOf(osRemove.getHoraSolicitacao()));
+
+                            server.processarMensagem(mensagemExcluir);
+                            System.out.println("Mensagem enviada ao servidor.");
                         } else {
                             System.out.println("Ordem de Serviço não encontrada.");
                         }
@@ -142,8 +149,12 @@ public class Main {
     public static Servidor gerarOrdensFicticias(Servidor server) {
 
         for (int i = 0; i <= 69; i++) {
-            OrdemServico os = new OrdemServico(i, "Serviço " + i, "Descrição do serviço " + i, (i * 2) % 24);
-            server.cadastrarOrdemServico(os);
+            // OrdemServico os = new OrdemServico(i, "Serviço " + i, "Descrição do serviço " + i, (i * 2) % 24);
+            // server.cadastrarOrdemServico(os);
+
+            Mensagem mensagem = new Mensagem(i, "Cadastrar", "Serviço " + i, "Descrição da " + i,  "" + i + ":" + i);
+            server.processarMensagem(mensagem);
+            System.out.println("Mensagem enviada ao servidor.");
         }
         return server;
     }
