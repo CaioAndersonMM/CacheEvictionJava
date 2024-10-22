@@ -9,7 +9,7 @@ public class ListaAutoajustavel {
     }
 
     public void adicionar(OrdemServico ordem) {
-        ordens.add(ordem);
+        ordens.add(0, ordem);
     }
 
     public OrdemServico buscar(int codigo) {
@@ -35,7 +35,10 @@ public class ListaAutoajustavel {
         if (index < 0 || index >= ordens.size()) {
             return null;
         }
-        return ordens.get(index);
+        OrdemServico ordem = ordens.get(index);
+        ordens.remove(index);
+        ordens.add(0, ordem);
+        return ordem;
     }
 
     public void listarOrdens() {
