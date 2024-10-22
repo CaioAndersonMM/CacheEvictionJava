@@ -235,19 +235,56 @@ public class Servidor {
         }
     }
 
+    private int[] construirLPS(String operacao) {
+        int[] lps = new int[operacao.length()];
+        int length = 0; // prefixo anterior
+        int i = 1;
+
+        while (i < operacao.length()) {
+            if (operacao.charAt(i) == operacao.charAt(length)) {
+                length++;
+                lps[i] = length;
+                i++;
+            } else {
+                if (length != 0) {
+                    length = lps[length - 1];
+                } else {
+                    lps[i] = 0;
+                    i++;
+                }
+            }
+        }
+        return lps;
+    }
+
     public List<Integer> buscarOcorrencias(String operacao) {
         List<Integer> ocorrencias = new ArrayList<>();
-        int index = logs.indexOf(operacao);
+        int[] lps = construirLPS(operacao);
+        int i = 0; // logs
+        int j = 0; // operacao
 
-        while (index != -1) {
-            ocorrencias.add(index); // Adiciona o índice da ocorrência
-            index = logs.indexOf(operacao, index + 1);
+        while (i < logs.length()) {
+            // Se os caracteres são iguais, incrementa ambos
+            if (operacao.charAt(j) == logs.charAt(i)) {
+                i++;
+                j++;
+            }
+
+            if (j == operacao.length()) {
+                ocorrencias.add(i - j); //Indice da ocorrencia
+                j = lps[j - 1]; // Ajusta j
+            } else if (i < logs.length() && operacao.charAt(j) != logs.charAt(i)) {
+                // Descontinuidade encontrada
+                if (j != 0) {
+                    j = lps[j - 1];
+                } else {
+                    i++;
+                }
+            }
         }
 
-        escreverLog("Buscando ocorrências da operação: " + operacao + ". Total encontrado: " + ocorrencias.size()
-                + ", Time: " + now());
+        escreverLog("Buscando ocorrências da operação: " + operacao.substring(0, 8) + ". Total encontrado: " + ocorrencias.size());
         System.out.println("Índices encontrados: " + ocorrencias);
-
         return ocorrencias;
     }
 
