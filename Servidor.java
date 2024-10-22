@@ -1,19 +1,24 @@
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Servidor {
     private TabelaHash tabelaHash;
     private CacheAutoajustavel cache;
     private Huffman huffman;
-
+    private String logs;
 
     public Servidor() {
         tabelaHash = new TabelaHash();
         cache = new CacheAutoajustavel();
+        this.logs = lerLog();
     }
 
     public void mostrarCache() {
@@ -27,28 +32,57 @@ public class Servidor {
         String nomeDescomprimido = mensagem.descomprimirNome();
         String descricaoDescomprimida = mensagem.descomprimirDescricao();
         String horaDescomprimida = mensagem.descomprimirHora();
-        System.out.println("Nome descomprimido: " + nomeDescomprimido);
-        System.out.println("Hora descomprimida: " + horaDescomprimida);
         String operacao = mensagem.descomprimirOperacao();
 
         switch (operacao) {
             case "Cadastrar":
-                OrdemServico osNova = new OrdemServico(cod, nomeDescomprimido, descricaoDescomprimida, horaDescomprimida);
+                OrdemServico osNova = new OrdemServico(cod, nomeDescomprimido, descricaoDescomprimida,
+                        horaDescomprimida);
                 cadastrarOrdemServico(osNova);
                 break;
 
             case "Alterar":
                 // O próprio método editar já faz a busca e pega a referência
-                OrdemServico OsEdit = new OrdemServico(cod, nomeDescomprimido, descricaoDescomprimida, horaDescomprimida);
+                OrdemServico OsEdit = new OrdemServico(cod, nomeDescomprimido, descricaoDescomprimida,
+                        horaDescomprimida);
                 atualizarOrdemServico(OsEdit);
                 break;
 
             case "Remover":
-                //Como usamos a referência, temos que buscar a OS para remover
+                // Como usamos a referência, temos que buscar a OS para remover
                 OrdemServico osRemover = buscarOrdemServico(cod, true);
+                if (osRemover != null) {
+                    removerOrdemServico(osRemover);
+                } else {
+                    System.out.println("Ordem de Serviço não encontrada.");
+                }
                 removerOrdemServico(osRemover);
                 break;
-
+            case "Listar":
+                System.out.println("Listando Ordem de Serviço: ");
+                mostrarTabelaHash();
+                break;
+            case "Quantidade":
+                System.out.println("Quantidade de Registros: " + quantidadeDeRegistros());
+                break;
+            case "Buscar":
+                OrdemServico osBuscada = buscarOrdemServico(cod, false);
+                if (osBuscada != null) {
+                    System.out.println(osBuscada);
+                } else {
+                    System.out.println("Ordem de Serviço não encontrada.");
+                }
+                break;
+            case "Cache":
+                mostrarCache();
+                break;
+            case "Mod":
+                System.out.println(
+                        "Mod: " + mostrarMod() + " Carga: " + String.format("%.2f", mostrarFatorDeCarga()) + "%");
+                break;
+            case "VerLog":
+                mostrarOcorrencias(cod);
+                break;
             default:
                 System.out.println("Operação não reconhecida: " + operacao);
         }
@@ -155,26 +189,80 @@ public class Servidor {
     }
 
     // public void mostrarOrdensServico() {
-    //     System.out.println();
-    //     this.tabelaHash.listarOS();
-    //     System.out.println();
+    // System.out.println();
+    // this.tabelaHash.listarOS();
+    // System.out.println();
     // }
 
     public int quantidadeDeRegistros() {
         return this.tabelaHash.getTamanho();
     }
 
-    public int mostrarMod(){
+    public int mostrarMod() {
         return this.tabelaHash.getMod();
     }
 
-    public float mostrarFatorDeCarga(){
+    public float mostrarFatorDeCarga() {
         return this.tabelaHash.getFatorDeCarga();
     }
-    
+
     private String now() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return LocalDateTime.now().format(formatter);
+    }
+
+    public void mostrarOcorrencias(int operacao) {
+        logs = lerLog(); // Lê o log de novo
+        switch (operacao) {
+            case 1:
+                List<Integer> insercaoOcorrencias = buscarOcorrencias("Insercao de Ordem de Servico");
+                System.out.println("Ocorrências de Inserção: " + insercaoOcorrencias.size());
+                break;
+            case 2:
+                List<Integer> remocaoOcorrencias = buscarOcorrencias("Remoção de Ordem de Serviço");
+                System.out.println("Ocorrências de Remoção: " + remocaoOcorrencias.size());
+                break;
+            case 3:
+                List<Integer> alteracaoOcorrencias = buscarOcorrencias("Alteracao na Ordem de Servido");
+                System.out.println("Ocorrências de Alteração: " + alteracaoOcorrencias.size());
+                break;
+            case 4:
+                List<Integer> buscaOcorrencias = buscarOcorrencias("Item buscado");
+                System.out.println("Ocorrências de Busca: " + buscaOcorrencias.size());
+                break;
+            default:
+                break;
+        }
+    }
+
+    public List<Integer> buscarOcorrencias(String operacao) {
+        List<Integer> ocorrencias = new ArrayList<>();
+        int index = logs.indexOf(operacao);
+
+        while (index != -1) {
+            ocorrencias.add(index); // Adiciona o índice da ocorrência
+            index = logs.indexOf(operacao, index + 1);
+        }
+
+        escreverLog("Buscando ocorrências da operação: " + operacao + ". Total encontrado: " + ocorrencias.size()
+                + ", Time: " + now());
+        System.out.println("Índices encontrados: " + ocorrencias);
+
+        return ocorrencias;
+    }
+
+    private String lerLog() {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader("log.txt"))) {
+            String linha;
+            while ((linha = br.readLine()) != null) {
+                sb.append(linha).append("\n");
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao ler o arquivo: " + e.getMessage());
+            return "";
+        }
+        return sb.toString();
     }
 
     private void escreverLog(String msg) {
