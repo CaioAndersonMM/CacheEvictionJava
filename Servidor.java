@@ -7,11 +7,13 @@ import java.time.format.DateTimeFormatter;
 
 public class Servidor {
     private TabelaHash tabelaHash;
-    private CacheHash cache;
+    private CacheAutoajustavel cache;
+    private Huffman huffman;
+
 
     public Servidor() {
         tabelaHash = new TabelaHash();
-        cache = new CacheHash();
+        cache = new CacheAutoajustavel();
     }
 
     public void mostrarCache() {
@@ -19,9 +21,43 @@ public class Servidor {
         cache.listarCache();
     }
 
+    public void processarMensagem(Mensagem mensagem) {
+        // Descomprimir os dados
+        int cod = mensagem.getCod();
+        String nomeDescomprimido = mensagem.descomprimirNome();
+        String descricaoDescomprimida = mensagem.descomprimirDescricao();
+        String horaDescomprimida = mensagem.descomprimirHora();
+        System.out.println("Nome descomprimido: " + nomeDescomprimido);
+        System.out.println("Hora descomprimida: " + horaDescomprimida);
+        String operacao = mensagem.descomprimirOperacao();
+
+        switch (operacao) {
+            case "Cadastrar":
+                OrdemServico osNova = new OrdemServico(cod, nomeDescomprimido, descricaoDescomprimida, horaDescomprimida);
+                cadastrarOrdemServico(osNova);
+                break;
+
+            case "Alterar":
+                // O próprio método editar já faz a busca e pega a referência
+                OrdemServico OsEdit = new OrdemServico(cod, nomeDescomprimido, descricaoDescomprimida, horaDescomprimida);
+                atualizarOrdemServico(OsEdit);
+                break;
+
+            case "Remover":
+                //Como usamos a referência, temos que buscar a OS para remover
+                OrdemServico osRemover = buscarOrdemServico(cod, true);
+                removerOrdemServico(osRemover);
+                break;
+
+            default:
+                System.out.println("Operação não reconhecida: " + operacao);
+        }
+    }
+
     public void cadastrarOrdemServico(OrdemServico os) {
         escreverLog("");
         escreverLog("Insercao de Ordem de Servico: " + os.getCodigo());
+        System.out.println("Inserção de Ordem de Serviço: " + os.getCodigo());
 
         tabelaHash.inserir(os.getCodigo(), os);
 
