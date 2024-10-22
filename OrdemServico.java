@@ -2,9 +2,9 @@ public class OrdemServico {
     private int codigo;
     private String nome;
     private String descricao;
-    private long horaSolicitacao;
+    private String horaSolicitacao;
 
-    public OrdemServico(int codigo, String nome, String descricao, long horaSolicitacao) {
+    public OrdemServico(int codigo, String nome, String descricao, String horaSolicitacao) {
         this.codigo = codigo;
         this.nome = nome;
         this.descricao = descricao;
@@ -23,7 +23,7 @@ public class OrdemServico {
         return descricao;
     }
 
-    public long getHoraSolicitacao() {
+    public String getHoraSolicitacao() {
         return horaSolicitacao;
     }
 
@@ -39,7 +39,7 @@ public class OrdemServico {
         this.descricao = descricao;
     }
 
-    public void setHoraSolicitacao(long horaSolicitacao) {
+    public void setHoraSolicitacao(String horaSolicitacao) {
         this.horaSolicitacao = horaSolicitacao;
     }
 
@@ -51,7 +51,7 @@ public class OrdemServico {
             "|| Código:      %4d           %n" +
             "|| Nome:        %-15s %n" +
             "|| Descrição:   %-15s %n" +
-            "|| Hora:        %04d          %n" +
+            "|| Hora:        %s         %n" +
             "+=============================+%n",
             codigo, nome, descricao, horaSolicitacao
         );
