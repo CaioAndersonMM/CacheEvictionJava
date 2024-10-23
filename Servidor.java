@@ -173,11 +173,11 @@ public class Servidor {
                 escreverLog("Item buscado foi adicionado na Cache: " + codigo + ", Time: " + now());
             }
 
-            escreverLog("");
-            escreverLog("Itens da cache: " + cache.gerarStringCache());
-
             return buscado;
         }
+
+        escreverLog("");
+        escreverLog("Itens da cache: " + cache.gerarStringCache());
 
         return null;
     }
