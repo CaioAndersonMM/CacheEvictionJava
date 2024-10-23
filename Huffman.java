@@ -90,7 +90,7 @@ public class Huffman {
         if (no == null) {
             return;
         }
-        if (no.esquerda == null && no.direita == null) {
+        if (no.esquerda == null && no.direita == null) { //Somente as folhas são letras!
             codigosHuffman.put(no.letra, codigo); // Mapeia a letra ao código
         } else {
             gerarCodigos(no.esquerda, codigo + '0');
@@ -116,7 +116,7 @@ public class Huffman {
         // Percorre bit por bit até achar a folha e pegar a letra
         for (char c : textoComprimido.toCharArray()) {
             no = (c == '0') ? no.esquerda : no.direita; // Vai para esquerda se '0', direita se '1'
-            if (no.esquerda == null && no.direita == null) {
+            if (no.esquerda == null && no.direita == null) { //Se é folha é letra, encontramos
                 textoOriginal.append(no.letra);
                 no = raiz; // Retorna à raiz para continuar a busca
             }

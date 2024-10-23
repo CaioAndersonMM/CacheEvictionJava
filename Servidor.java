@@ -166,7 +166,7 @@ public class Servidor {
 
         if (buscado != null) { // Encontrou na árvore
 
-            System.out.println("Ordem de Serviço encontrada na base de dados (Árvore)! ");
+            System.out.println("Ordem de Serviço encontrada na base de dados! ");
 
             if (!isRemove) {
                 cache.adicionar(buscado); // Adiciona na cache APENAS se não for buscar de remoção
